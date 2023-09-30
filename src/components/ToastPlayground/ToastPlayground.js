@@ -2,32 +2,24 @@ import React from "react";
 
 import Button from "../Button";
 import ToastShelf from "../ToastShelf";
+import { ToastContext } from "../ToastProvider";
 
 import styles from "./ToastPlayground.module.css";
 
-const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
-
 function ToastPlayground() {
-  const [toasts, setToasts] = React.useState([]);
-  const [toastMessage, setToastMessage] = React.useState("");
-  const [toastVariant, setToastVariant] = React.useState(VARIANT_OPTIONS[0]);
+  const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
+  const { createToast } = React.useContext(ToastContext);
+
+  const [message, setMessage] = React.useState("");
+  const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
 
   function handleNewToast(event) {
     event.preventDefault();
-    const newToast = {
-      id: crypto.randomUUID(),
-      toastMessage,
-      toastVariant,
-    };
 
-    setToasts([...toasts, newToast]);
-    setToastMessage("");
-    setToastVariant(VARIANT_OPTIONS[0]);
-  }
+    createToast(message, variant);
 
-  function handleDismiss(id) {
-    const filteredToast = toasts.filter((toast) => toast.id !== id);
-    setToasts(filteredToast);
+    setMessage("");
+    setVariant(VARIANT_OPTIONS[0]);
   }
 
   return (
@@ -37,7 +29,7 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      <ToastShelf toasts={toasts} handleDismiss={handleDismiss} />
+      <ToastShelf />
 
       <form className={styles.controlsWrapper} onSubmit={handleNewToast}>
         <div className={styles.row}>
@@ -53,8 +45,8 @@ function ToastPlayground() {
               required
               id="message"
               className={styles.messageInput}
-              value={toastMessage}
-              onChange={(event) => setToastMessage(event.target.value)}
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
             />
           </div>
         </div>
@@ -70,8 +62,8 @@ function ToastPlayground() {
                   type="radio"
                   name="variant"
                   value={option}
-                  checked={option === toastVariant}
-                  onChange={(event) => setToastVariant(event.target.value)}
+                  checked={option === variant}
+                  onChange={(event) => setVariant(event.target.value)}
                 />
                 {option}
               </label>
